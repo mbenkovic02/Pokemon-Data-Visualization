@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pokémon Comparison App</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      background: url('images/bg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #e0e0e0;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: -1;
+    }
+    header {
+      background: #000;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.5em;
+    }
+    nav button {
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      margin-left: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    .container {
+      max-width: 1400px;
+      margin: auto;
+      padding: 20px;
+    }
+    .comparison-area, .filter-area, .list-area {
+      margin-top: 20px;
+    }
+    .compare-card {
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid #00aaff;
+      border-radius: 12px;
+      padding: 10px;
+      width: 300px;
+      color: white;
+      min-height: 300px;
+    }
+    .placeholder-text {
+      color: #777;
+      font-style: italic;
+      text-align: center;
+      margin-top: 40%;
+    }
+    .pokemon-card {
+      background: #111;
+      border-radius: 12px;
+      padding: 10px;
+      margin: 10px;
+      color: white;
+      display: inline-block;
+      width: 150px;
+      text-align: center;
+    }
+    svg {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid #00aaff;
+      border-radius: 12px;
+      margin: 10px auto;
+      display: block;
+    }
+    #searchbar,
+    #sort-select {
+      margin: 20px 0 10px 0;
+      padding: 10px 16px;
+      background-color: #222;
+      border: 2px solid #00aaff;
+      border-radius: 8px;
+      color: #e0e0e0;
+      font-size: 16px;
+      box-shadow: 0 0 6px rgba(0, 170, 255, 0.3);
+      width: 100%;
+      max-width: 400px;
+    }
+    #searchbar::placeholder {
+      color: #888;
+    }
+    #sort-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20fill%3D%22%23e0e0e0%22%20viewBox%3D%220%200%2024%2024%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M7%2010l5%205%205-5z%22/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Pokémon Comparison</h1>
+    <nav>
+      <button onclick="location.href='index.html'">Comparison</button>
+      <button onclick="location.href='pages/statistics.html'">Statistics</button>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="comparison-area" id="comparison-area"></div>
+
+    <!-- Search and Sort Controls -->
+    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+      <input type="text" id="searchbar" placeholder="Search by name, form or type">
+      <select id="sort-select">
+        <option value="pokedex">Sort by Pokedex Number</option>
+        <option value="name">Sort by Name</option>
+        <option value="total-asc">Sort by Total Stats (Ascending)</option>
+        <option value="total-desc">Sort by Total Stats (Descending)</option>
+      </select>
+    </div>
+
+    <div class="list-area" id="pokemon-list"></div>
+  </div>
+  <script type="module" src="js/app.js"></script>
+  
+</body>
+</html>

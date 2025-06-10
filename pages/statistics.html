@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pokémon Statistics</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      background: url('../images/bg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #e0e0e0;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: -1;
+    }
+    header {
+      background: #000;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.5em;
+    }
+    nav button {
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      margin-left: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    .container {
+      max-width: 1400px;
+      margin: auto;
+      padding: 20px;
+    }
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 30px;
+      justify-items: center;
+      margin-top: 30px;
+    }
+    svg {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid #00aaff;
+      border-radius: 12px;
+    }
+    h2, h3, p {
+      text-align: center;
+      color: #e0e0e0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Pokémon Statistics</h1>
+    <nav>
+      <button onclick="location.href='../index.html'">Comparison</button>
+      <button onclick="location.href='statistics.html'">Statistics</button>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h2>Base Stat Distributions</h2>
+    <p><em>X-axis: Stat Value | Y-axis: Percentage of Pokémon</em></p>
+    <div id="stat-charts" class="chart-grid"></div>
+  </div>
+
+  <script>
+    const statLabels = {
+      "Health Stat": "HP",
+      "Attack Stat": "Attack",
+      "Defense Stat": "Defense",
+      "Special Attack Stat": "Sp. Attack",
+      "Special Defense Stat": "Sp. Defense",
+      "Speed Stat": "Speed"
+    };
+
+    const statKeys = Object.keys(statLabels);
+
+    d3.csv("../data/Pokemon_Database_Filtered.csv").then(data => {
+      statKeys.forEach(stat => {
+        const values = data.map(d => +d[stat]).filter(v => !isNaN(v));
+        const width = 300;
+        const height = 200;
+        const margin = { top: 10, right: 10, bottom: 30, left: 40 };
+
+        const x = d3.scaleLinear()
+          .domain([0, 250])
+          .range([margin.left, width - margin.right]);
+
+        const bins = d3.bin().domain(x.domain()).thresholds(20)(values);
+
+        const y = d3.scaleLinear()
+          .domain([0, 0.18]) // 18%
+          .range([height - margin.bottom, margin.top]);
+
+        const svg = d3.create("svg")
+          .attr("width", width)
+          .attr("height", height);
+
+        svg.append("g")
+          .selectAll("rect")
+          .data(bins)
+          .enter().append("rect")
+            .attr("x", d => x(d.x0) + 1)
+            .attr("y", y(0))
+            .attr("width", d => Math.max(0, x(d.x1) - x(d.x0) - 1))
+            .attr("height", 0)
+            .attr("fill", "#66c2ff")
+          .transition()
+            .duration(800)
+            .delay((d, i) => i * 20)
+            .attr("y", d => y(d.length / values.length))
+            .attr("height", d => y(0) - y(d.length / values.length));
+
+        svg.append("g")
+          .attr("transform", `translate(0,${height - margin.bottom})`)
+          .call(d3.axisBottom(x).ticks(5))
+          .selectAll("text").style("fill", "#e0e0e0");
+
+        svg.append("g")
+          .attr("transform", `translate(${margin.left},0)`)
+          .call(d3.axisLeft(y)
+            .tickValues([0, 0.03, 0.06, 0.09, 0.12, 0.15, 0.18])
+            .tickFormat(d3.format(".0%"))
+          )
+          .selectAll("text").style("fill", "#e0e0e0");
+
+        const container = d3.select("#stat-charts").append("div");
+        container.append(() => svg.node());
+        container.append("h3").text(statLabels[stat]);
+      });
+    });
+  </script>
+</body>
+</html>
